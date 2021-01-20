@@ -98,7 +98,7 @@
         {
           "alias": "",
           "format": "time_series",
-          "rawSql": "SELECT\n  interval_time as time,\n  sum(updates) as updates, sum(withdraws) as withdraws\nFROM stats_chg_bypeer s\nWHERE $__timeFilter(interval_time)\n   AND s.peer_hash_id IN (SELECT peer_hash_id\n                            from v_peers\n                            where peername = '$peer_name')\n\ngroup by interval_time\nORDER BY interval_time ASC\n",
+          "rawSql": "SELECT\n  interval_time as time,\n  sum(updates) as updates, sum(withdraws) as withdraws\nFROM bmp_stats_by_peer s\nWHERE $__timeFilter(interval_time)\n   AND s.peer_hash_id IN (SELECT peer_hash_id\n                            from bmp_v_peers\n                            where peername = '$peer_name')\n\ngroup by interval_time\nORDER BY interval_time ASC\n",
           "refId": "A"
         }
       ],
@@ -187,7 +187,7 @@
         {
           "alias": "",
           "format": "time_series",
-          "rawSql": "SELECT\n  interval_time as time,\n  sum(updates) + sum(withdraws) as value,\n  left(PeerName,32) as metric\nFROM stats_chg_bypeer l\n  JOIN v_peers p ON (l.peer_hash_id = p.peer_hash_id)\nWHERE $__timeFilter(interval_time)\n   AND p.peername = '$peer_name'\nGROUP BY l.interval_time,peername\nORDER BY interval_time ASC\n\n",
+          "rawSql": "SELECT\n  interval_time as time,\n  sum(updates) + sum(withdraws) as value,\n  left(PeerName,32) as metric\nFROM bmp_stats_by_peer l\n  JOIN bmp_v_peers p ON (l.peer_hash_id = p.peer_hash_id)\nWHERE $__timeFilter(interval_time)\n   AND p.peername = '$peer_name'\nGROUP BY l.interval_time,peername\nORDER BY interval_time ASC\n\n",
           "refId": "A"
         }
       ],
@@ -317,7 +317,7 @@
           "alias": "",
           "format": "table",
           "hide": false,
-          "rawSql": " select lastmodified,event,routername,peername,prefix,\n        origin_as,as_path,communities \n    from v_ip_routes_history \n    where  $__timeFilter(lastmodified)\n      AND peername = '$peer_name'\n    order by lastmodified desc,id desc\n    limit 1000;",
+          "rawSql": " select lastmodified,event,routername,peername,prefix,\n        origin_as,as_path,communities \n    from bmp_v_ip_routes_history \n    where  $__timeFilter(lastmodified)\n      AND peername = '$peer_name'\n    order by lastmodified desc,id desc\n    limit 1000;",
           "refId": "A"
         }
       ],
@@ -367,7 +367,7 @@
         "multi": false,
         "name": "router_name",
         "options": [],
-        "query": "select distinct routername from v_peers",
+        "query": "select distinct routername from bmp_v_peers",
         "refresh": 1,
         "regex": "",
         "sort": 0,
@@ -387,13 +387,13 @@
         "multi": false,
         "name": "peer_name",
         "options": [],
-        "query": "select peername from v_peers where routername = '[[router_name]]'",
+        "query": "select peername from bmp_v_peers where routername = '[[router_name]]'",
         "refresh": 1,
         "regex": "",
         "sort": 1,
         "tagValuesQuery": "",
         "tags": [],
-        "tagsQuery": "select concat(routername, ' ', peername) from v_peers",
+        "tagsQuery": "select concat(routername, ' ', peername) from bmp_v_peers",
         "type": "query",
         "useTags": false
       }

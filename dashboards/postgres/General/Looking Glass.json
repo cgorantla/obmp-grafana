@@ -124,7 +124,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n  floor(extract(epoch from max(r.timestamp))) as time,\n  CASE WHEN v.router_hash_id is null THEN 'Not in Router RIB' ELSE 'In Router Rib' END as metric,\n  1 as value\nFROM routers r\n  left join (select distinct router_hash_id\n             from v_ip_routes \n             where prefix = (select prefix from ip_rib where prefix >>= '[[prefix]]' order by prefix_len desc limit 1)\n                and iswithdrawn = false group by router_hash_id) v \n            on (r.hash_id = v.router_hash_id)\nWHERE r.state = 'up'\nGROUP BY r.hash_id,v.router_hash_id\n\n",
+          "rawSql": "SELECT\n  floor(extract(epoch from max(r.last_updated))) as time,\n  CASE WHEN v.router_hash_id is null THEN 'Not in Router RIB' ELSE 'In Router Rib' END as metric,\n  1 as value\nFROM bmp_routers r\n  left join (select distinct router_hash_id\n             from bmp_v_ip_routes \n             where prefix = (select prefix from bmp_ip_ribs where prefix::inet >>= '[[prefix]]' order by prefix_len desc limit 1)\n                and is_withdrawn = false group by router_hash_id) v \n            on (r.hash_id = v.router_hash_id)\nWHERE r.state = 'up'\nGROUP BY r.hash_id,v.router_hash_id\n\n",
           "refId": "A"
         }
       ],
@@ -168,7 +168,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n  floor(extract(epoch from max(p.timestamp))) as time,\n  CASE WHEN v.peer_hash_id is null THEN 'Not in Peers RIB' ELSE 'In Peer RIB' END as metric,\n  1 as value\nFROM bgp_peers p\n  left join (select peer_hash_id,isipv4\n             from v_ip_routes \n             where prefix = (select prefix from ip_rib where prefix >>= '[[prefix]]' order by prefix_len desc limit 1)\n                and iswithdrawn = false group by peer_hash_id,isipv4) v \n            on (p.hash_id = v.peer_hash_id)\nWHERE p.isipv4 = CASE WHEN family('[[prefix]]') = 4 THEN true ELSE false END\n  AND p.state = 'up'\nGROUP BY p.hash_id,v.peer_hash_id,p.isipv4\n\n",
+          "rawSql": "SELECT\n  floor(extract(epoch from max(p.last_updated))) as time,\n  CASE WHEN v.peer_hash_id is null THEN 'Not in Peers RIB' ELSE 'In Peer RIB' END as metric,\n  1 as value\nFROM bmp_peers p\n  left join (select peer_hash_id,isPeerIPv4\n             from bmp_v_ip_routes \n             where prefix = (select prefix from bmp_ip_ribs where inet(prefix) >>= '[[prefix]]' order by prefix_len desc limit 1)\n                and is_withdrawn = false group by peer_hash_id,isipv4) v \n            on (p.hash_id = v.peer_hash_id)\nWHERE p.isipv4 = CASE WHEN family('[[inet(prefix)]]') = 4 THEN true ELSE false END\n  AND p.state = 'up'\nGROUP BY p.hash_id,v.peer_hash_id,p.isipv4\n\n",
           "refId": "A"
         }
       ],
@@ -239,7 +239,7 @@
         {
           "alias": "",
           "format": "table",
-          "rawSql": "select distinct origin_as,i.as_name,org_id,org_name,remarks,address,city,state_prov,country,raw_output,source\n  from ip_rib r LEFT JOIN  info_asn i ON (i.asn = r.origin_as)\n  where r.prefix = (select prefix from ip_rib where prefix >>= '[[prefix]]' order by prefix desc limit 1) \n    and origin_as > 0\n",
+          "rawSql": "select distinct origin_as,i.as_name,org_id,org_name,remarks,address,city,state_prov,country,raw_output,source\n  from bmp_ip_ribs r LEFT JOIN  bmp_asn_info i ON (i.asn = r.origin_as)\n  where r.prefix = (select prefix from bmp_ip_ribs where inet(prefix) >>= '[[prefix]]' order by prefix desc limit 1) \n    and origin_as > 0\n",
           "refId": "A"
         }
       ],
@@ -330,7 +330,7 @@
         {
           "alias": "",
           "format": "table",
-          "rawSql": "select distinct r.origin_as as recv_origin_as,\n    CASE WHEN g.rpki_origin_as is null THEN 0 ELSE g.rpki_origin_as END as rpki_origin_as,\n    CASE WHEN i.origin_as is null THEN 0 ELSE i.origin_as END as irr_origin_as,\n    i.descr,i.source\n  from ip_rib r \n    LEFT JOIN info_route i ON (i.prefix = r.prefix)\n    LEFT JOIN global_ip_rib g ON (g.prefix = r.prefix)\n  where r.prefix = (select prefix from ip_rib where prefix >>= '[[prefix]]' order by prefix desc limit 1)\n    and r.origin_as > 0\n",
+          "rawSql": "select distinct r.origin_as as recv_origin_as,\n    CASE WHEN g.rpki_origin_as is null THEN 0 ELSE g.rpki_origin_as END as rpki_origin_as,\n    CASE WHEN i.origin_as is null THEN 0 ELSE i.origin_as END as irr_origin_as,\n    i.descr,i.source\n  from bmp_ip_ribs r \n    LEFT JOIN bmp_route_info i ON (i.prefix = r.prefix)\n    LEFT JOIN bmp_global_ip_ribs g ON (g.prefix = r.prefix)\n  where r.prefix = (select prefix from bmp_ip_ribs where inet(prefix) >>= '[[prefix]]' order by prefix desc limit 1)\n    and r.origin_as > 0\n",
           "refId": "A"
         }
       ],
@@ -432,7 +432,7 @@
           "alias": "",
           "format": "table",
           "hide": false,
-          "rawSql": " select lastmodified,routername,peername,prefix,prefixlen,\n        origin_as,med,localpref,as_path,communities \n    from v_ip_routes \n    where prefix = (select prefix from ip_rib where prefix >>= '[[prefix]]' order by prefix_len desc limit 1)\n      AND iswithdrawn = false\n      \n    order by routername,peername \n    limit 2000;",
+          "rawSql": " select lastmodified,routername,peername,prefix,prefixlen,\n        origin_as,med,localpref,as_path,communities \n    from bmp_v_ip_routes \n    where prefix = (select prefix from bmp_ip_ribs where inet(prefix) >>= '[[prefix]]' order by prefix_len desc limit 1)\n      AND is_withdrawn = false\n      \n    order by routername,peername \n    limit 2000;",
           "refId": "A"
         }
       ],

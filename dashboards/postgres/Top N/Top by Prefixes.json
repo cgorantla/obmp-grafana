@@ -91,7 +91,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n  interval_time as time,\n   sum(updates) as updates,sum(withdraws) as withdraws\nFROM stats_chg_bypeer s\n  JOIN v_peers p ON (s.peer_hash_id = p.peer_hash_id)\nWHERE $__timeFilter(interval_time)\n  AND routername in ($router_name)\nGROUP BY interval_time\nORDER BY interval_time ASC\n\n",
+          "rawSql": "SELECT\n  interval_time as time,\n   sum(updates) as updates,sum(withdraws) as withdraws\nFROM bmp_stats_by_peer s\n  JOIN bmp_v_peers p ON (s.peer_hash_id = p.peer_hash_id)\nWHERE $__timeFilter(interval_time)\n  AND routername in ($router_name)\nGROUP BY interval_time\nORDER BY interval_time ASC\n\n",
           "refId": "A"
         }
       ],
@@ -181,7 +181,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n    interval_time as time,\n    updates as updates,\n    p.RouterName as metric\n  FROM stats_chg_bypeer l\n  JOIN v_peers p ON (p.peer_hash_id = l.peer_hash_id)\n  WHERE $__timeFilter(interval_time)\n    AND p.routername IN ($router_name)\n  order by interval_time asc\n\n",
+          "rawSql": "SELECT\n    interval_time as time,\n    updates as updates,\n    p.RouterName as metric\n  FROM bmp_stats_by_peer l\n  JOIN bmp_v_peers p ON (p.peer_hash_id = l.peer_hash_id)\n  WHERE $__timeFilter(interval_time)\n    AND p.routername IN ($router_name)\n  order by interval_time asc\n\n",
           "refId": "A"
         }
       ],
@@ -269,7 +269,7 @@
         {
           "alias": "",
           "format": "time_series",
-          "rawSql": "SELECT\n    interval_time as time,\n    withdraws,\n    p.RouterName as metric\n  FROM stats_chg_bypeer l\n  JOIN v_peers p ON (p.peer_hash_id = l.peer_hash_id)\n  WHERE $__timeFilter(interval_time)\n     AND p.routername IN ($router_name)\n  order by interval_time asc\n\n",
+          "rawSql": "SELECT\n    interval_time as time,\n    withdraws,\n    p.RouterName as metric\n  FROM bmp_stats_by_peer l\n  JOIN bmp_v_peers p ON (p.peer_hash_id = l.peer_hash_id)\n  WHERE $__timeFilter(interval_time)\n     AND p.routername IN ($router_name)\n  order by interval_time asc\n\n",
           "refId": "A"
         }
       ],
@@ -357,7 +357,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n    interval_time as time,\n    updates,\n    p.PeerName as metric\n  FROM stats_chg_bypeer l\n  JOIN v_peers p ON (p.peer_hash_id = l.peer_hash_id)\n  WHERE $__timeFilter(interval_time)\n     AND p.routername IN ($router_name)\n  order by interval_time asc\n",
+          "rawSql": "SELECT\n    interval_time as time,\n    updates,\n    p.PeerName as metric\n  FROM bmp_stats_by_peer l\n  JOIN bmp_v_peers p ON (p.peer_hash_id = l.peer_hash_id)\n  WHERE $__timeFilter(interval_time)\n     AND p.routername IN ($router_name)\n  order by interval_time asc\n",
           "refId": "A"
         }
       ],
@@ -445,7 +445,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n    interval_time as time,\n    withdraws,\n    p.PeerName as metric\n  FROM stats_chg_bypeer l\n  JOIN v_peers p ON (p.peer_hash_id = l.peer_hash_id)\n  WHERE $__timeFilter(interval_time)\n     AND p.routername IN ($router_name)\n  order by interval_time asc\n",
+          "rawSql": "SELECT\n    interval_time as time,\n    withdraws,\n    p.PeerName as metric\n  FROM bmp_stats_by_peer l\n  JOIN bmp_v_peers p ON (p.peer_hash_id = l.peer_hash_id)\n  WHERE $__timeFilter(interval_time)\n     AND p.routername IN ($router_name)\n  order by interval_time asc\n",
           "refId": "A"
         }
       ],
@@ -534,7 +534,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n    max(interval_time) as time,\n    sum(updates) as value,\n    prefix as metric\n  FROM stats_chg_byprefix l\n  WHERE $__timeFilter(interval_time)\n      AND peer_hash_id in (SELECT peer_hash_id from v_peers where routername in ($router_name))\n  GROUP BY prefix\n  order by value desc\nLIMIT 20",
+          "rawSql": "SELECT\n    max(interval_time) as time,\n    sum(updates) as value,\n    prefix as metric\n  FROM bmp_stats_by_prefix l\n  WHERE $__timeFilter(interval_time)\n      AND peer_hash_id in (SELECT peer_hash_id from bmp_v_peers where routername in ($router_name))\n  GROUP BY prefix\n  order by value desc\nLIMIT 20",
           "refId": "A"
         }
       ],
@@ -624,7 +624,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n    max(interval_time) as time,\n    sum(withdraws) as value,\n    prefix as metric\n  FROM stats_chg_byprefix\n  WHERE $__timeFilter(interval_time)\n      AND peer_hash_id in (SELECT peer_hash_id from v_peers where routername in ($router_name))\n  GROUP BY prefix\n  order by value desc\nLIMIT 20;\n",
+          "rawSql": "SELECT\n    max(interval_time) as time,\n    sum(withdraws) as value,\n    prefix as metric\n  FROM bmp_stats_by_prefix\n  WHERE $__timeFilter(interval_time)\n      AND peer_hash_id in (SELECT peer_hash_id from bmp_v_peers where routername in ($router_name))\n  GROUP BY prefix\n  order by value desc\nLIMIT 20;\n",
           "refId": "A"
         }
       ],
@@ -687,7 +687,7 @@
         "multi": true,
         "name": "router_name",
         "options": [],
-        "query": "select routername from v_peers group by routername",
+        "query": "select routername from bmp_v_peers group by routername",
         "refresh": 1,
         "regex": "",
         "sort": 1,

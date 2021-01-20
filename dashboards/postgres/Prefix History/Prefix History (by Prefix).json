@@ -126,7 +126,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n  interval_time as time,\n  sum(updates) as updates, sum(withdraws) as withdraws\nFROM stats_chg_byprefix s\nWHERE $__timeFilter(interval_time)\n   AND s.prefix = '[[prefix]]'\n\ngroup by interval_time\nORDER BY interval_time ASC\n",
+          "rawSql": "SELECT\n  interval_time as time,\n  sum(updates) as updates, sum(withdraws) as withdraws\nFROM bmp_stats_by_prefix s\nWHERE $__timeFilter(interval_time)\n   AND s.prefix = '[[prefix]]'\n\ngroup by interval_time\nORDER BY interval_time ASC\n",
           "refId": "A"
         }
       ],
@@ -215,7 +215,7 @@
         {
           "alias": "",
           "format": "time_series",
-          "rawSql": "SELECT\n  interval_time as time,\n  sum(updates) + sum(withdraws) as value,\n  left(PeerName,32) as metric\nFROM stats_chg_byprefix s\n  JOIN v_peers p ON (s.peer_hash_id = p.peer_hash_id)\nWHERE $__timeFilter(interval_time)\n   AND s.prefix = '[[prefix]]'\nGROUP BY s.interval_time,peername\nORDER BY interval_time ASC\n\n",
+          "rawSql": "SELECT\n  interval_time as time,\n  sum(updates) + sum(withdraws) as value,\n  left(PeerName,32) as metric\nFROM bmp_stats_by_prefix s\n  JOIN bmp_v_peers p ON (s.peer_hash_id = p.peer_hash_id)\nWHERE $__timeFilter(interval_time)\n   AND s.prefix = '[[prefix]]'\nGROUP BY s.interval_time,peername\nORDER BY interval_time ASC\n\n",
           "refId": "A"
         }
       ],
@@ -345,7 +345,7 @@
           "alias": "",
           "format": "table",
           "hide": false,
-          "rawSql": " select lastmodified,event,routername,peername,prefix,\n        origin_as,as_path,communities \n    from v_ip_routes_history \n    where  $__timeFilter(lastmodified)\n      AND prefix = '[[prefix]]'\n      \n    order by lastmodified desc,id desc\n    limit 1000;",
+          "rawSql": " select lastmodified,event,routername,peername,prefix,\n        origin_as,as_path,communities \n    from bmp_v_ip_routes_history \n    where  $__timeFilter(lastmodified)\n      AND prefix = '[[prefix]]'\n      \n    order by lastmodified desc,id desc\n    limit 1000;",
           "refId": "A"
         }
       ],

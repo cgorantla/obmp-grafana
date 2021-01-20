@@ -107,13 +107,13 @@
         {
           "alias": "",
           "format": "time_series",
-          "rawSql": "SELECT\n  max(timestamp) as time,\n  count(*) as \"ipv4\"\nFROM\n  global_ip_rib\nWHERE\n  recv_origin_as = [[asn_num]]\n  and family(prefix) = 4\nGROUP BY prefix\n",
+          "rawSql": "SELECT\n  max(last_updated) as time,\n  count(*) as \"ipv4\"\nFROM\n  bmp_global_ip_ribs\nWHERE\n  recv_origin_as = [[asn_num]]\n  and family(inet(prefix)) = 4\nGROUP BY prefix\n",
           "refId": "A"
         },
         {
           "alias": "",
           "format": "time_series",
-          "rawSql": "SELECT\n  max(timestamp) as time,\n  count(*) as \"ipv6\"\nFROM\n  global_ip_rib\nWHERE\n  recv_origin_as = [[asn_num]]\n  and family(prefix) = 6\nGROUP BY prefix\n",
+          "rawSql": "SELECT\n  max(last_updated) as time,\n  count(*) as \"ipv6\"\nFROM\n  bmp_global_ip_ribs\nWHERE\n  recv_origin_as = [[asn_num]]\n  and family(inet(prefix)) = 6\nGROUP BY prefix\n",
           "refId": "B"
         }
       ],
@@ -185,7 +185,7 @@
           "alias": "",
           "format": "table",
           "hide": false,
-          "rawSql": "select count(distinct asn_left) as count\n  from as_path_analysis a\n  where a.asn = [[asn_num]]\n",
+          "rawSql": "select count(distinct asn_left) as count\n  from bmp_asn_path_analysis a\n  where a.asn = [[asn_num]]\n",
           "refId": "A"
         }
       ],
@@ -357,7 +357,7 @@
           "alias": "",
           "format": "table",
           "hide": false,
-          "rawSql": "select count(distinct asn_right) as count\n  from as_path_analysis a\n  where a.asn = [[asn_num]] and asn_right != 0\n",
+          "rawSql": "select count(distinct asn_right) as count\n  from bmp_asn_path_analysis a\n  where a.asn = [[asn_num]] and asn_right != 0\n",
           "refId": "A"
         }
       ],
@@ -421,7 +421,7 @@
           "alias": "",
           "format": "table",
           "hide": false,
-          "rawSql": "select as_name,org_id,org_name,address,city,state_prov,country,remarks,raw_output,source \n  from info_asn i \n  where asn = [[asn_num]]",
+          "rawSql": "select as_name,org_id,org_name,address,city,state_prov,country,remarks,raw_output,source \n  from bmp_asn_info i \n  where asn = [[asn_num]]",
           "refId": "A"
         }
       ],
@@ -491,7 +491,7 @@
         {
           "alias": "",
           "format": "table",
-          "rawSql": "select a.asn_left as \"ASN\",max(as_name) as \"Name\",max(org_id) as \"Org Id\",max(org_name) as \"Org Name\",max(city) as \"City\",\n    max(state_prov) as \"State\",max(country) as \"Country\",max(source) as \"Source\"\n  from as_path_analysis a\n      LEFT JOIN info_asn i ON (i.asn = a.asn_left)\n  where a.asn = [[asn_num]] and asn_left != 0\n  group by a.asn_left",
+          "rawSql": "select a.asn_left as \"ASN\",max(as_name) as \"Name\",max(org_id) as \"Org Id\",max(org_name) as \"Org Name\",max(city) as \"City\",\n    max(state_prov) as \"State\",max(country) as \"Country\",max(source) as \"Source\"\n  from bmp_asn_path_analysis a\n      LEFT JOIN bmp_asn_info i ON (i.asn = a.asn_left)\n  where a.asn = [[asn_num]] and asn_left != 0\n  group by a.asn_left",
           "refId": "A"
         }
       ],
@@ -561,7 +561,7 @@
         {
           "alias": "",
           "format": "table",
-          "rawSql": "select  a.asn_right as \"ASN\",max(as_name) as \"Name\",max(org_id) as \"Org Id\",max(org_name) as \"Org Name\",max(city) as \"City\",\n    max(state_prov) as \"State\",max(country) as \"Country\",max(source) as \"Source\"\n  from as_path_analysis a\n      LEFT JOIN info_asn i ON (i.asn = a.asn_right)\n  where a.asn = [[asn_num]] and asn_right != 0\n  group by a.asn_right",
+          "rawSql": "select  a.asn_right as \"ASN\",max(as_name) as \"Name\",max(org_id) as \"Org Id\",max(org_name) as \"Org Name\",max(city) as \"City\",\n    max(state_prov) as \"State\",max(country) as \"Country\",max(source) as \"Source\"\n  from bmp_asn_path_analysis a\n      LEFT JOIN bmp_asn_info i ON (i.asn = a.asn_right)\n  where a.asn = [[asn_num]] and asn_right != 0\n  group by a.asn_right",
           "refId": "A"
         }
       ],
@@ -655,7 +655,7 @@
         {
           "alias": "",
           "format": "table",
-          "rawSql": "SELECT r.prefix as \"Prefix\",g.rpki_origin_as AS \"RPKI Origin AS\",i.origin_as as \"IRR Origin AS\",\"Last Change\", i.descr as \"IRR Description\", i.source as \"IRR Source\"\n\nFROM (\n      select\n        prefix,\n        max(timestamp) as \"Last Change\"\n      FROM global_ip_rib\n      WHERE recv_origin_as = [[asn_num]]\n      GROUP BY prefix\n  ) r\n  LEFT JOIN info_route i ON (i.prefix = r.prefix)\n  LEFT JOIN global_ip_rib g ON (g.prefix = r.prefix)\n\n\n",
+          "rawSql": "SELECT r.prefix as \"Prefix\",g.rpki_origin_as AS \"RPKI Origin AS\",i.origin_as as \"IRR Origin AS\",\"Last Change\", i.descr as \"IRR Description\", i.source as \"IRR Source\"\n\nFROM (\n      select\n        prefix,\n        max(last_updated) as \"Last Change\"\n      FROM bmp_global_ip_ribs \n      WHERE recv_origin_as = [[asn_num]]\n      GROUP BY prefix\n  ) r\n  LEFT JOIN bmp_route_info i ON (i.prefix = r.prefix)\n  LEFT JOIN bmp_global_ip_ribs g ON (g.prefix = r.prefix)\n\n\n",
           "refId": "A"
         }
       ],
