@@ -248,7 +248,7 @@
         {
           "alias": "",
           "format": "time_series",
-          "rawSql": "SELECT\n  $__time(interval_time),\n  v4_prefixes,v6_prefixes,v4_with_rpki,v6_with_rpki,v4_with_irr,v6_with_irr\nFROM\n  stats_ip_origins\nWHERE\n  $__timeFilter(interval_time) and asn = [[asn_num]]\nORDER BY interval_time asc\n",
+          "rawSql": "SELECT\n  $__time(interval_time),\n  v4_prefixes,v6_prefixes,v4_with_rpki,v6_with_rpki,v4_with_irr,v6_with_irr\nFROM\n  bmp_stats_ip_origins\nWHERE\n  $__timeFilter(interval_time) and asn = [[asn_num]]\nORDER BY interval_time asc\n",
           "refId": "A"
         }
       ],

@@ -203,7 +203,7 @@
           "alias": "",
           "format": "table",
           "hide": false,
-          "rawSql": "select max(r.last_updated) as timestamp,r.name,max(ip_address) as ip_address,max(r.state) as state,\n    count(*) as peers,max(description) as description, CASE WHEN max(r.state) = 'up' THEN 1 ELSE 0 END as stateBool\n  from bmp_routers r\n  JOIN bmp_peers p on (r.hash_id = p.router_hash_id)\n  GROUP BY r.name;",
+          "rawSql": "select max(r.last_updated) as timestamp,r.name,max(ip_address) as ip_address,max(r.state) as state,\n    count(*) as peers,max(description) as description, CASE WHEN max(r.state) = 'UP' THEN 1 ELSE 0 END as stateBool\n  from bmp_routers r\n  JOIN bmp_peers p on (r.hash_id = p.router_hash_id)\n  GROUP BY r.name;",
           "refId": "A"
         }
       ],
@@ -382,7 +382,7 @@
         {
           "alias": "",
           "format": "table",
-          "rawSql": " SELECT\n    max(RouterName) as \"RouterName\",\n    max(PeerName) as \"PeerName\",\n    max(PeerIP) as \"PeerIP\",\n    max(PeerASN) as \"PeerASN\",\n    max(peer_state) as \"State\",\n    max(LastModified) as \"LastModified\",\n    max(v4_prefixes) as \"IPv4 Prefixes\",\n    max(v6_prefixes) as \"IPv6 Prefixes\",\n    CASE WHEN max(peer_state) = 'up' THEN 1 ELSE 0 END as stateBool\nFROM bmp_v_peers p\n  LEFT JOIN bmp_stats_peer_rib s ON (p.peer_hash_id = s.peer_hash_id\n          AND s.interval_time >= now() - interval '20 minutes')\nGROUP BY p.peer_hash_id;\n",
+          "rawSql": " SELECT\n    max(RouterName) as \"RouterName\",\n    max(PeerName) as \"PeerName\",\n    max(PeerIP) as \"PeerIP\",\n    max(PeerASN) as \"PeerASN\",\n    max(peer_state) as \"State\",\n    max(LastModified) as \"LastModified\",\n    max(v4_prefixes) as \"IPv4 Prefixes\",\n    max(v6_prefixes) as \"IPv6 Prefixes\",\n    CASE WHEN max(peer_state) = 'UP' THEN 1 ELSE 0 END as stateBool\nFROM bmp_v_peers p\n  LEFT JOIN bmp_stats_peer_rib s ON (p.peer_hash_id = s.peer_hash_id\n          AND s.interval_time >= now() - interval '20 minutes')\nGROUP BY p.peer_hash_id;\n",
           "refId": "A"
         }
       ],

@@ -124,7 +124,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n  floor(extract(epoch from max(r.last_updated))) as time,\n  CASE WHEN v.router_hash_id is null THEN 'Not in Router RIB' ELSE 'In Router Rib' END as metric,\n  1 as value\nFROM bmp_routers r\n  left join (select distinct router_hash_id\n             from bmp_v_ip_routes \n             where prefix = (select prefix from bmp_ip_ribs where prefix::inet >>= '[[prefix]]' order by prefix_len desc limit 1)\n                and is_withdrawn = false group by router_hash_id) v \n            on (r.hash_id = v.router_hash_id)\nWHERE r.state = 'up'\nGROUP BY r.hash_id,v.router_hash_id\n\n",
+          "rawSql": "SELECT\n  floor(extract(epoch from max(r.last_updated))) as time,\n  CASE WHEN v.router_hash_id is null THEN 'Not in Router RIB' ELSE 'In Router Rib' END as metric,\n  1 as value\nFROM bmp_routers r\n  left join (select distinct router_hash_id\n             from bmp_v_ip_routes \n             where prefix = (select prefix from bmp_ip_ribs where inet(prefix) >>= '[[prefix]]' order by prefix_len desc limit 1)\n                and is_withdrawn = false group by router_hash_id) v \n            on (r.hash_id = v.router_hash_id)\nWHERE r.state = 'UP'\nGROUP BY r.hash_id,v.router_hash_id\n\n",
           "refId": "A"
         }
       ],
@@ -168,7 +168,7 @@
           "alias": "",
           "format": "time_series",
           "hide": false,
-          "rawSql": "SELECT\n  floor(extract(epoch from max(p.last_updated))) as time,\n  CASE WHEN v.peer_hash_id is null THEN 'Not in Peers RIB' ELSE 'In Peer RIB' END as metric,\n  1 as value\nFROM bmp_peers p\n  left join (select peer_hash_id,isPeerIPv4\n             from bmp_v_ip_routes \n             where prefix = (select prefix from bmp_ip_ribs where inet(prefix) >>= '[[prefix]]' order by prefix_len desc limit 1)\n                and is_withdrawn = false group by peer_hash_id,isipv4) v \n            on (p.hash_id = v.peer_hash_id)\nWHERE p.isipv4 = CASE WHEN family('[[inet(prefix)]]') = 4 THEN true ELSE false END\n  AND p.state = 'up'\nGROUP BY p.hash_id,v.peer_hash_id,p.isipv4\n\n",
+          "rawSql": "SELECT\n  floor(extract(epoch from max(p.last_updated))) as time,\n  CASE WHEN v.peer_hash_id is null THEN 'Not in Peers RIB' ELSE 'In Peer RIB' END as metric,\n  1 as value\nFROM bmp_peers p\n  left join (select peer_hash_id,isPeerIPv4\n             from bmp_v_ip_routes \n             where prefix = (select prefix from bmp_ip_ribs where inet(prefix) >>= '[[prefix]]' order by prefix_len desc limit 1)\n                and is_withdrawn = false group by peer_hash_id,isipv4) v \n            on (p.hash_id = v.peer_hash_id)\nWHERE p.is_ipv4 = CASE WHEN family(inet('[[prefix]]')) = 4 THEN true ELSE false END\n  AND p.state = 'UP'\nGROUP BY p.hash_id,v.peer_hash_id,p.isipv4\n\n",
           "refId": "A"
         }
       ],
